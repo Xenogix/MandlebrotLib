@@ -1,0 +1,10 @@
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\MandlebrotLib.csproj.AssemblyReference.cache
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\MandlebrotLib.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\MandlebrotLib.AssemblyInfoInputs.cache
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\MandlebrotLib.AssemblyInfo.cs
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\MandlebrotLib.csproj.CoreCompileInputs.cache
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\bin\Debug\net6.0\MandlebrotLib.deps.json
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\bin\Debug\net6.0\MandlebrotLib.dll
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\MandlebrotLib.dll
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\refint\MandlebrotLib.dll
+C:\Users\arthu\Desktop\Projects\MandlebrotLib\MandlebrotLib\obj\Debug\net6.0\ref\MandlebrotLib.dll

@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "eY4X2PhDPi+NBOvzg4OLjD1EVEGiOyDGZtiW3x4VVjBWqPxZNcvNrcf2D3vmgSrdpW+agBm/JHYWi+sXtq40Mw==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\arthu\\Desktop\\Projects\\MandlebrotLib\\MandlebrotLib\\MandlebrotLib.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\arthu\\.nuget\\packages\\ilgpu\\1.3.0\\ilgpu.1.3.0.nupkg.sha512",
+    "C:\\Users\\arthu\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
+    "C:\\Users\\arthu\\.nuget\\packages\\system.collections.immutable\\6.0.0\\system.collections.immutable.6.0.0.nupkg.sha512",
+    "C:\\Users\\arthu\\.nuget\\packages\\system.drawing.common\\6.0.0\\system.drawing.common.6.0.0.nupkg.sha512",
+    "C:\\Users\\arthu\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
+    "C:\\Users\\arthu\\.nuget\\packages\\system.reflection.metadata\\6.0.1\\system.reflection.metadata.6.0.1.nupkg.sha512",
+    "C:\\Users\\arthu\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
