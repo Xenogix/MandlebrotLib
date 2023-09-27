@@ -21,19 +21,13 @@ namespace MandlebrotLib
         public const double MAX_ZOOM = 8e13;
         public const int MAX_ITERATION = 2000;
 
-        public event EventHandler ValueChanged;
+        public event EventHandler? ValueChanged;
 
         private int width;
         public int Width { get => width; set { width = value; NotifyValueChanged(); } }
 
         private int height;
         public int Height { get => height; set { height = value; NotifyValueChanged(); } }
-
-        private double targetX;
-        public double TargetX { get => targetX; set { targetX = value; NotifyValueChanged(); } }
-
-        private double targetY;
-        public double TargetY { get => targetY; set { targetY = value; NotifyValueChanged(); } }
 
         private double posX;
         public double PosX { get => posX; set { posX = value; NotifyValueChanged(); } }
@@ -47,17 +41,17 @@ namespace MandlebrotLib
         private double zoom;
         public double Zoom { get => zoom; set { zoom = Math.Min(value, MAX_ZOOM); NotifyValueChanged(); } }
 
-        private Context context;
-        private Accelerator accelerator;
+        private readonly Context context;
+        private readonly Accelerator accelerator;
 
-        private Action<Index1D, ArrayView<double>, ArrayView<double>, ArrayView<double>, int, int> loadedMandlebrotKernel;
-        private Action<Index1D, ArrayView<double>, ArrayView<byte>> loadedColouringKernel;
+        private readonly Action<Index1D, ArrayView<double>, ArrayView<double>, ArrayView<double>, int, int> loadedMandlebrotKernel;
+        private readonly Action<Index1D, ArrayView<double>, ArrayView<byte>> loadedColouringKernel;
 
-        private MemoryBuffer1D<byte, Stride1D.Dense> kernelImageBits;
+        private MemoryBuffer1D<byte, Stride1D.Dense>? kernelImageBits;
 
-        private MemoryBuffer1D<double, Stride1D.Dense> kernelCooXBuffer;
-        private MemoryBuffer1D<double, Stride1D.Dense> kernelCooYBuffer;
-        private MemoryBuffer1D<double, Stride1D.Dense> kernelImageIterations;
+        private MemoryBuffer1D<double, Stride1D.Dense>? kernelCooXBuffer;
+        private MemoryBuffer1D<double, Stride1D.Dense>? kernelCooYBuffer;
+        private MemoryBuffer1D<double, Stride1D.Dense>? kernelImageIterations;
 
         private GCHandle bitsHandle;
         private GCHandle BitsHandle
@@ -72,26 +66,17 @@ namespace MandlebrotLib
             }
         }
 
-        public MandlebrotGPU(int iterations, int width, int height, double targetX = 0, double targetY = 0, double posX = 0, double posY = 0, double zoom = 1)
+        public MandlebrotGPU(int iterations, int width, int height, double posX = 0, double posY = 0, double zoom = 1)
         {
             this.Iterations = iterations;
             this.Width = width;
             this.Height = height;
-            this.TargetX = targetX;
-            this.TargetY = targetY;
             this.PosX = posX;
             this.PosY = posY;
             this.Zoom = zoom;
 
-            Initialize();
-        }
-
-        private void Initialize()
-        {
             context = Context.CreateDefault();
-
             accelerator = context.CreateCudaAccelerator(0);
-
             loadedMandlebrotKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<double>, ArrayView<double>, ArrayView<double>, int, int>(CalculateMandlebrotKernel);
             loadedColouringKernel = accelerator.LoadAutoGroupedStreamKernel<Index1D, ArrayView<double>, ArrayView<byte>>(CalculateColorsKernel);
         }
@@ -119,8 +104,8 @@ namespace MandlebrotLib
 
         private void StartMandlebrotKernel()
         {
-            double[] cooX = GetCoordinatesX(Width, TargetX, PosX, zoom);
-            double[] cooY = GetCoordinatesY(Height, TargetY, PosY, zoom);
+            double[] cooX = GetCoordinatesX(Width, PosX, zoom);
+            double[] cooY = GetCoordinatesY(Height, PosY, zoom);
 
             kernelCooXBuffer = accelerator.Allocate1D(cooX);
             kernelCooYBuffer = accelerator.Allocate1D(cooY);
@@ -132,6 +117,8 @@ namespace MandlebrotLib
 
         private void StartColouringKernel()
         {
+            if (kernelImageIterations == null) return;
+
             kernelImageBits = accelerator.Allocate1D<byte>(Width * Height * 4);
 
             loadedColouringKernel(Height * Width, kernelImageIterations.View, kernelImageBits.View);
@@ -140,10 +127,10 @@ namespace MandlebrotLib
 
         private void DisposeBuffers()
         {
-            kernelCooXBuffer.Dispose();
-            kernelCooYBuffer.Dispose();
-            kernelImageIterations.Dispose();
-            kernelImageBits.Dispose();
+            kernelCooXBuffer?.Dispose();
+            kernelCooYBuffer?.Dispose();
+            kernelImageIterations?.Dispose();
+            kernelImageBits?.Dispose();
         }
 
         private Bitmap GenerateBitmap()
@@ -176,7 +163,7 @@ namespace MandlebrotLib
                 ++iteration;
             }
 
-            imageIterations[i] = IntrinsicMath.Clamp((float)iteration / (float)maxIteration, 0, 1);
+            imageIterations[i] = IntrinsicMath.Clamp(iteration / (float)maxIteration, 0, 1);
         }
 
         private static void CalculateColorsKernel(Index1D i, ArrayView<double> imageIterations, ArrayView<byte> imageBits)
@@ -200,34 +187,34 @@ namespace MandlebrotLib
             imageBits[i * 4 + 3] = 255;
         }
 
-        private static double[] GetCoordinatesX(int width, double targetX, double posX, double zoom)
+        private static double[] GetCoordinatesX(int width, double posX, double zoom)
         {
             double[] result = new double[width];
 
             for (int x = 0; x < width; x++)
-                result[x] = GetCoordinateX(width, targetX, posX, zoom, (double)x / width);
+                result[x] = GetCoordinateX(width, posX, zoom, (double)x / width);
 
             return result;
         }
 
-        private static double[] GetCoordinatesY(int height, double targetY, double posY, double zoom)
+        private static double[] GetCoordinatesY(int height, double posY, double zoom)
         {
             double[] result = new double[height];
 
             for (int y = 0; y < height; y++)
-                result[y] = GetCoordinateY(height, targetY, posY, zoom, (double)y / height);
+                result[y] = GetCoordinateY(height, posY, zoom, (double)y / height);
 
             return result;
         }
 
-        public double ScreenToX0(double screenPosX, double screenWidth) => GetCoordinateX(Width, 0, PosX, zoom, screenPosX / screenWidth);
-        public double ScreenToY0(double screenPosY, double screenHeight) => GetCoordinateY(Height, 0, PosY, zoom, screenPosY / screenHeight);
+        public double ScreenToX0(double screenPosX, double screenWidth) => GetCoordinateX(Width, PosX, zoom, screenPosX / screenWidth);
+        public double ScreenToY0(double screenPosY, double screenHeight) => GetCoordinateY(Height, PosY, zoom, screenPosY / screenHeight);
 
         public double GetRangeWidth() => GetRangeWidth(Width, zoom);
         public double GetRangeHeight() => GetRangeHeight(Height, zoom);
 
-        private static double GetCoordinateX(int width, double targetX, double posX, double zoom, double ratioX) => posX + GetRangeWidth(width, zoom) * ratioX - GetRangeWidth(width, zoom) / 2d;
-        private static double GetCoordinateY(int height, double targetY, double posY, double zoom, double ratioY) => -(posY + GetRangeHeight(height, zoom) * ratioY - GetRangeHeight(height, zoom) / 2d);
+        private static double GetCoordinateX(int width, double posX, double zoom, double ratioX) => posX + GetRangeWidth(width, zoom) * ratioX - GetRangeWidth(width, zoom) / 2d;
+        private static double GetCoordinateY(int height, double posY, double zoom, double ratioY) => -(posY + GetRangeHeight(height, zoom) * ratioY - GetRangeHeight(height, zoom) / 2d);
 
         private static double GetRangeWidth(int width, double zoom) => (MAX_X0 - MIN_X0) / DEFAULT_SCREEN_WIDTH / zoom * width;
         private static double GetRangeHeight(int height, double zoom) => (MAX_Y0 - MIN_Y0) / DEFAULT_SCREEN_HEIGHT / zoom * height;
